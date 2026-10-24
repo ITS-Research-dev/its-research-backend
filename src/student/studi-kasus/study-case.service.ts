@@ -134,6 +134,8 @@ export class StudyCaseService {
         starterCode: userScore?.uCode || '# Tulis kode kamu di sini\n',
         hints,
         hasSubmitted,
+        allowRetry: userScore?.allowRetry,
+        retryDeadline: userScore?.retryDeadline,
         submission: userScore
           ? {
               score: userScore.averageScore,
