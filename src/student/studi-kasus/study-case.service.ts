@@ -326,13 +326,16 @@ export class StudyCaseService {
   /**
    * Invalidate cache untuk study case
    */
-  async invalidateStudyCaseCache(topicId?: string, testId?: string) {
+  async invalidateStudyCaseCache(topicId?: string, testId?: string, userId?: string) {
     const keysToDelete: string[] = [];
 
     if (topicId) {
       keysToDelete.push(`${this.CACHE_PREFIX}:case:${topicId}`);
       keysToDelete.push(`${this.CACHE_PREFIX}:tests:${topicId}`);
     }
+    
+    if(userId) keysToDelete.push(`${this.CACHE_PREFIX}:case:${userId}`);
+    if(topicId && userId) keysToDelete.push(`${this.CACHE_PREFIX}:case:${topicId}:${userId}`);
 
     if (testId) {
       // Delete all hint levels for this test

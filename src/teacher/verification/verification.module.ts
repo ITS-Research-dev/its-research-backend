@@ -7,8 +7,9 @@ import { User } from '../../general/user/entities/user.entity';
 import { Test } from '../../general/test/entities/test.entity';
 import { RedisModule } from '../../redis/redis.module';
 import { ProgressModule } from '../../general/progress/progress.module';
+import { StudentModule } from '../../student/student.module';
 @Module({
-    imports: [TypeOrmModule.forFeature([Score, User, Test]), RedisModule, ProgressModule],
+    imports: [TypeOrmModule.forFeature([Score, User, Test]), RedisModule, ProgressModule, StudentModule],
     controllers: [VerificationController],
     providers: [VerificationService],
     exports: [VerificationService],

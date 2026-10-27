@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Score } from '../../general/score/entities/score.entity';
 import { RedisService } from '../../redis/redis.service';
 import { ProgressService } from '../../general/progress/progress.service';
+import { StudyCaseService } from '../../student/studi-kasus/study-case.service';
 
 @Injectable()
 export class VerificationService {
@@ -14,6 +15,7 @@ export class VerificationService {
     @InjectRepository(Score) private scoreRepo: Repository<Score>,
     private readonly redisService: RedisService,
     private readonly progressService: ProgressService,
+    private readonly studyCaseService: StudyCaseService
   ) {}
 
   private parseJsonScores(raw: any): Record<string, number> {
@@ -110,6 +112,7 @@ export class VerificationService {
         relations: {
           test: { topic: true },
         },
+        order: { createdAt: 'DESC' }
       }).then((scores) => scores.map((score) => this.formatScoreEntity(score)));
       await this.redisService.set(cacheKey, results, this.CACHE_TTL);
 
@@ -236,7 +239,7 @@ export class VerificationService {
 
   async retry(id: string, payload: any) {
     try {
-      const score = await this.scoreRepo.findOne({ where: { id } });
+      const score = await this.scoreRepo.findOne({ where: { id }, relations: { test: true } });
       if (!score)
         throw new NotFoundException(`Score dengan id ${id} tidak ditemukan`);
 
@@ -245,10 +248,9 @@ export class VerificationService {
       score.retryDeadline = payload.retryDeadline;
       await this.scoreRepo.save(score);
 
-      console.log(score);
-
       await this.progressService.removeProgress(score.idUser, score.idTest);
       await this.invalidateVerificationCache(id, score.idUser);
+      await this.studyCaseService.invalidateStudyCaseCache(score.test.idTopic, undefined ,score.idUser);
       return { ok: true };
     } catch (e: any) {
       console.warn('VerificationService.retry error:', e?.message || e);

@@ -155,7 +155,7 @@ export class OllamaService {
         konsep: 95,
       },
       overallScore: 95,
-      flagOverride: false,
+      flagOverride: true,
       aiSuggestion: 'Niba kamu',
       aiFinishTime: new Date().toTimeString().slice(0, 8),
       hintUsage,
